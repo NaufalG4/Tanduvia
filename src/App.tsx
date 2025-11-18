@@ -43,7 +43,11 @@ export default function App() {
   const handleLogin = (role: 'admin' | 'parent' | 'nutritionist', name: string) => {
     setUserRole(role);
     setUserName(name);
+    if (role === 'nutritionist') {
+    setCurrentPage('nutrition');
+  } else {
     setCurrentPage('dashboard');
+  }
   };
 
   // Handler untuk logout

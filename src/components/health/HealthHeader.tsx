@@ -1,169 +1,147 @@
-import { Heart, BookOpen, Home, Menu, X, ClipboardPlus, LogOut, User } from 'lucide-react';
+// src/components/health/HealthHeader.tsx
 import { Button } from '../ui/button';
-import { useState } from 'react';
-import { Badge } from '../ui/badge';
+import { cn } from '../../lib/utils'; // kalau di project-mu pakai helper lain, sesuaikan
+import { LayoutDashboard, BookOpen, LogOut, Edit3 } from 'lucide-react';
+
+type PageType = 'dashboard' | 'education' | 'input' | 'nutrition';
+
+type UserRole = 'admin' | 'parent' | 'nutritionist' | null;
 
 interface HealthHeaderProps {
-  currentPage: 'dashboard' | 'education' | 'input';
-  onNavigate: (page: 'dashboard' | 'education' | 'input' | 'landing') => void;
-  userRole?: 'admin' | 'parent' | null;
-  userName?: string;
-  onLogout?: () => void;
+  currentPage: PageType;
+  onNavigate: (page: PageType | 'landing') => void;
+  userRole: UserRole;
+  userName: string;
+  onLogout: () => void;
 }
 
-export function HealthHeader({ currentPage, onNavigate, userRole, userName, onLogout }: HealthHeaderProps) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+const getRoleLabel = (role: UserRole) => {
+  if (role === 'admin') return 'Petugas Posyandu';
+  if (role === 'parent') return 'Orang Tua';
+  if (role === 'nutritionist') return 'Ahli Gizi';
+  return '';
+};
 
+const getRoleBadgeClass = (role: UserRole) => {
+  if (role === 'admin') return 'bg-indigo-100 text-indigo-700';
+  if (role === 'parent') return 'bg-slate-100 text-slate-700';
+  if (role === 'nutritionist') return 'bg-emerald-100 text-emerald-700';
+  return '';
+};
+
+export function HealthHeader({
+  currentPage,
+  onNavigate,
+  userRole,
+  userName,
+  onLogout,
+}: HealthHeaderProps) {
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <button 
-            onClick={() => onNavigate('landing')}
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-          >
-            <div className="bg-blue-600 text-white p-2 rounded-lg">
-              <Heart className="h-5 w-5" fill="currentColor" />
-            </div>
-            <span className="text-gray-900 hidden sm:inline">Tanduvia: Posyandu Digital</span>
-          </button>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-4">
-            <Button
-              variant={currentPage === 'dashboard' ? 'default' : 'ghost'}
-              onClick={() => onNavigate('dashboard')}
-              className="gap-2"
-            >
-              <Home className="h-4 w-4" />
-              Dashboard
-            </Button>
-            
-            {/* Input hanya untuk admin */}
-            {userRole === 'admin' && (
-              <Button
-                variant={currentPage === 'input' ? 'default' : 'ghost'}
-                onClick={() => onNavigate('input')}
-                className="gap-2"
-              >
-                <ClipboardPlus className="h-4 w-4" />
-                Input Data
-              </Button>
-            )}
-            
-            <Button
-              variant={currentPage === 'education' ? 'default' : 'ghost'}
-              onClick={() => onNavigate('education')}
-              className="gap-2"
-            >
-              <BookOpen className="h-4 w-4" />
-              Panduan Gizi
-            </Button>
-
-            {/* User Info & Logout */}
-            <div className="flex items-center gap-3 ml-2 pl-4 border-l border-gray-200">
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4 text-gray-600" />
-                <div className="flex flex-col items-start">
-                  <span className="text-sm font-medium text-gray-900">{userName}</span>
-                  <Badge variant="secondary" className="text-xs">
-                    {userRole === 'admin' ? 'Petugas' : 'Orang Tua'}
-                  </Badge>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onLogout}
-                className="gap-2"
-              >
-                <LogOut className="h-4 w-4" />
-                Keluar
-              </Button>
-            </div>
-          </nav>
-
-          {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </Button>
+    <header className="sticky top-0 z-20 border-b bg-white/80 backdrop-blur">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+        {/* Logo / Title */}
+        <div className="flex items-center gap-2">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white">
+            <span className="text-lg font-bold">♥</span>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-gray-900">
+              Tanduvia: Posyandu Digital
+            </p>
+            <p className="text-xs text-gray-500">
+              Monitoring gizi & tumbuh kembang balita
+            </p>
+          </div>
         </div>
 
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200">
-            <nav className="flex flex-col gap-2">
-              {/* User Info */}
-              <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg mb-2">
-                <User className="h-4 w-4 text-gray-600" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">{userName}</p>
-                  <p className="text-xs text-gray-600">
-                    {userRole === 'admin' ? 'Petugas Posyandu' : 'Orang Tua'}
-                  </p>
-                </div>
-              </div>
+        {/* Navigation */}
+        <nav className="flex items-center gap-2">
+          {/* Dashboard selalu ada untuk user logged-in */}
+          <Button
+            variant={currentPage === 'dashboard' ? 'default' : 'ghost'}
+            size="sm"
+            className={cn(
+              'gap-2 rounded-full',
+              currentPage === 'dashboard' && 'bg-gray-900 text-white'
+            )}
+            onClick={() => onNavigate('dashboard')}
+          >
+            <LayoutDashboard className="h-4 w-4" />
+            Dashboard
+          </Button>
 
-              <Button
-                variant={currentPage === 'dashboard' ? 'default' : 'ghost'}
-                onClick={() => {
-                  onNavigate('dashboard');
-                  setMobileMenuOpen(false);
-                }}
-                className="gap-2 justify-start"
-              >
-                <Home className="h-4 w-4" />
-                Dashboard
-              </Button>
-
-              {userRole === 'admin' && (
-                <Button
-                  variant={currentPage === 'input' ? 'default' : 'ghost'}
-                  onClick={() => {
-                    onNavigate('input');
-                    setMobileMenuOpen(false);
-                  }}
-                  className="gap-2 justify-start"
-                >
-                  <ClipboardPlus className="h-4 w-4" />
-                  Input Data
-                </Button>
+          {/* Input data hanya untuk admin (petugas posyandu) */}
+          {userRole === 'admin' && (
+            <Button
+              variant={currentPage === 'input' ? 'default' : 'ghost'}
+              size="sm"
+              className={cn(
+                'gap-2 rounded-full',
+                currentPage === 'input' && 'bg-gray-900 text-white'
               )}
+              onClick={() => onNavigate('input')}
+            >
+              <Edit3 className="h-4 w-4" />
+              Input Data
+            </Button>
+          )}
 
-              <Button
-                variant={currentPage === 'education' ? 'default' : 'ghost'}
-                onClick={() => {
-                  onNavigate('education');
-                  setMobileMenuOpen(false);
-                }}
-                className="gap-2 justify-start"
+          {/* Halaman kelola gizi khusus ahli gizi */}
+          {userRole === 'nutritionist' && (
+            <Button
+              variant={currentPage === 'nutrition' ? 'default' : 'ghost'}
+              size="sm"
+              className={cn(
+                'gap-2 rounded-full',
+                currentPage === 'nutrition' && 'bg-gray-900 text-white'
+              )}
+              onClick={() => onNavigate('nutrition')}
+            >
+              <Edit3 className="h-4 w-4" />
+              Kelola Gizi
+            </Button>
+          )}
+
+          {/* Pendidikan gizi bisa diakses semua role */}
+          <Button
+            variant={currentPage === 'education' ? 'default' : 'ghost'}
+            size="sm"
+            className={cn(
+              'gap-2 rounded-full',
+              currentPage === 'education' && 'bg-gray-900 text-white'
+            )}
+            onClick={() => onNavigate('education')}
+          >
+            <BookOpen className="h-4 w-4" />
+            Panduan Gizi
+          </Button>
+        </nav>
+
+        {/* User info + logout */}
+        <div className="flex items-center gap-3">
+          <div className="text-right">
+            <p className="text-sm font-medium text-gray-900">{userName}</p>
+            {userRole && (
+              <span
+                className={
+                  'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ' +
+                  getRoleBadgeClass(userRole)
+                }
               >
-                <BookOpen className="h-4 w-4" />
-                Panduan Gizi
-              </Button>
-
-              <div className="border-t border-gray-200 my-2"></div>
-
-              <Button
-                variant="outline"
-                onClick={() => {
-                  onLogout?.();
-                  setMobileMenuOpen(false);
-                }}
-                className="gap-2 justify-start"
-              >
-                <LogOut className="h-4 w-4" />
-                Keluar
-              </Button>
-            </nav>
+                {getRoleLabel(userRole)}
+              </span>
+            )}
           </div>
-        )}
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2 rounded-full"
+            onClick={() => onNavigate('landing')}
+          >
+            <LogOut className="h-4 w-4" />
+            Keluar
+          </Button>
+        </div>
       </div>
     </header>
   );

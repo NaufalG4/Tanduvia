@@ -1,103 +1,96 @@
 // src/components/health/LoginPage.tsx
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { ArrowLeft } from 'lucide-react';
+
+type UserRole = 'admin' | 'parent' | 'nutritionist';
 
 interface LoginPageProps {
-  onLogin: (role: 'admin' | 'parent' | 'nutritionist', name: string) => void;
+  onLogin: (role: UserRole, name: string) => void;
   onBack: () => void;
 }
 
 export function LoginPage({ onLogin, onBack }: LoginPageProps) {
   const [name, setName] = useState('');
-  const [role, setRole] = useState<'admin' | 'parent' | 'nutritionist' | ''>('');
+  const [role, setRole] = useState<UserRole>('parent');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!name.trim()) {
-      alert('Nama tidak boleh kosong.');
-      return;
-    }
-
-    if (!role) {
-      alert('Silakan pilih peran terlebih dahulu.');
-      return;
-    }
-
+    if (!name.trim()) return;
     onLogin(role, name.trim());
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <Card className="w-full max-w-md shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <Card className="w-full max-w-md">
         <CardHeader>
-          <button
-            type="button"
-            className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-2"
-            onClick={onBack}
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Kembali
-          </button>
-          <CardTitle>Masuk ke Sistem Pemantauan Gizi Balita</CardTitle>
-          <CardDescription>
-            Pilih peran Anda dan masukkan identitas untuk mengakses dashboard.
-          </CardDescription>
+          <CardTitle className="text-lg">
+            Masuk ke Tanduvia
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Nama */}
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <Label htmlFor="name">Nama Lengkap</Label>
               <Input
                 id="name"
-                placeholder="Contoh: Ibu Aisyah / Kader Lilis / dr. Rina"
+                placeholder="Contoh: dr. Rina, S.Gz"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={e => setName(e.target.value)}
               />
             </div>
 
-            {/* Peran */}
             <div className="space-y-2">
               <Label>Masuk sebagai</Label>
-              <Select
-                value={role}
-                onValueChange={(value) =>
-                  setRole(value as 'admin' | 'parent' | 'nutritionist')
-                }
+              <div className="grid gap-2">
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="parent"
+                    checked={role === 'parent'}
+                    onChange={() => setRole('parent')}
+                  />
+                  <span>Ibu / Orang Tua Balita</span>
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="admin"
+                    checked={role === 'admin'}
+                    onChange={() => setRole('admin')}
+                  />
+                  <span>Petugas / Kader Posyandu</span>
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="nutritionist"
+                    checked={role === 'nutritionist'}
+                    onChange={() => setRole('nutritionist')}
+                  />
+                  <span>Ahli Gizi</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={onBack}
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih peran" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="admin">
-                    Kader Posyandu / Petugas Lapangan
-                  </SelectItem>
-                  <SelectItem value="parent">
-                    Ibu Balita / Orang Tua
-                  </SelectItem>
-                  <SelectItem value="nutritionist">
-                    Ahli Gizi / Tenaga Kesehatan
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+                Kembali
+              </Button>
+              <Button type="submit" className="flex-1">
+                Masuk
+              </Button>
             </div>
-
-            <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 text-xs text-blue-900 space-y-1">
-              <p><strong>Kader:</strong> dapat mengelola data pemeriksaan dan input BB/TB.</p>
-              <p><strong>Ibu balita:</strong> hanya dapat melihat perkembangan gizi anaknya sendiri.</p>
-              <p><strong>Ahli gizi:</strong> fokus pada analisis balita berisiko stunting/wasting.</p>
-            </div>
-
-            {/* Tombol submit */}
-            <Button type="submit" className="w-full">
-              Masuk
-            </Button>
           </form>
         </CardContent>
       </Card>
