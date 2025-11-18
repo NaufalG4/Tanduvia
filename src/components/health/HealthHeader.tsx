@@ -108,7 +108,7 @@ export function HealthHeader({
             </Button>
           )}
 
-          {/* Pendidikan gizi bisa diakses semua role */}
+          {/* nutrisi gizi bisa diakses semua role */}
           <Button
             variant={currentPage === 'education' ? 'default' : 'ghost'}
             size="sm"
