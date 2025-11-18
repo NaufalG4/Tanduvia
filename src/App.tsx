@@ -6,10 +6,13 @@ import { HealthDashboard } from './components/health/HealthDashboard';
 import { ParentDashboard } from './components/health/ParentDashboard';
 import { NutritionEducation } from './components/health/NutritionEducation';
 import { HealthDataInput } from './components/health/HealthDataInput';
+import { NutritionManagement } from './components/health/NutritionManagement';
+
 import { Toaster } from './components/ui/sonner';
 import { childrenHealthData } from './data/mockHealthData';
+import { nutritionGuidelines } from './data/nutritionGuidelines';
+
 import { ChildHealthData } from './types/health';
-import { NutritionistDashboard } from './components/health/NutritionistDashboard';
 
 type UserRole = 'admin' | 'parent' | 'nutritionist' | null;
 type PageType = 'landing' | 'login' | 'dashboard' | 'education' | 'input';
@@ -36,7 +39,7 @@ export default function App() {
     setCurrentPage('education');
   };
 
-  // Handler untuk login
+  // Handler untuk login (3 role)
   const handleLogin = (role: 'admin' | 'parent' | 'nutritionist', name: string) => {
     setUserRole(role);
     setUserName(name);
@@ -67,7 +70,7 @@ export default function App() {
     setCurrentPage('dashboard');
   };
 
-  // Landing page
+  // Landing page (belum login)
   if (currentPage === 'landing') {
     return (
       <>
@@ -87,7 +90,7 @@ export default function App() {
     );
   }
 
-  // Education page dapat diakses tanpa login
+  // Education page bisa diakses tanpa login
   if (currentPage === 'education' && !userRole) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -116,10 +119,10 @@ export default function App() {
               onStartInput={() => setCurrentPage('input')}
             />
           ) : userRole === 'nutritionist' ? (
-            // Ahli gizi: fokus ke manajemen gizi & anak berisiko
-            <NutritionistDashboard children={healthData} />
+            // Ahli gizi: halaman khusus kelola informasi gizi
+            <NutritionManagement guidelines={nutritionGuidelines} />
           ) : (
-            // Ibu balita
+            // Ibu balita / orang tua
             <ParentDashboard
               children={parentChildren}
               parentName={userName}
@@ -129,7 +132,7 @@ export default function App() {
           userRole === 'admin' ? (
             <HealthDataInput onSubmit={handleAddHealthData} />
           ) : (
-            // Orang tua & ahli gizi tidak boleh input pemeriksaan
+            // Ibu & ahli gizi tidak boleh input pemeriksaan
             <div className="min-h-screen flex items-center justify-center p-4">
               <div className="text-center">
                 <h2 className="mb-2 text-gray-900">Akses Terbatas</h2>
@@ -140,6 +143,7 @@ export default function App() {
             </div>
           )
         ) : (
+          // currentPage === 'education' saat sudah login
           <NutritionEducation />
         )}
       </main>
