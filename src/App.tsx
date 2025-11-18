@@ -19,6 +19,12 @@ export default function App() {
   const [userName, setUserName] = useState('');
   const [healthData, setHealthData] = useState<ChildHealthData[]>(childrenHealthData);
 
+  // Data khusus untuk orang tua: hanya lihat anak dengan parentName = nama login
+  const parentChildren = healthData.filter(
+    (child) =>
+      child.parentName.trim().toLowerCase() === userName.trim().toLowerCase()
+  );
+
   // Handler untuk mulai dari landing page (ke login)
   const handleGetStarted = () => {
     setCurrentPage('login');
@@ -41,7 +47,7 @@ export default function App() {
     setUserRole(null);
     setUserName('');
     setCurrentPage('landing');
-    // Reset data saat logout (opsional)
+    // Kalau mau reset data ke mock awal saat logout, bisa buka komentar ini:
     // setHealthData(childrenHealthData);
   };
 
@@ -56,7 +62,7 @@ export default function App() {
 
   // Handler untuk menambah data baru (hanya admin)
   const handleAddHealthData = (newData: ChildHealthData) => {
-    setHealthData(prev => [newData, ...prev]);
+    setHealthData((prev) => [newData, ...prev]);
     // Navigasi ke dashboard setelah submit
     setCurrentPage('dashboard');
   };
@@ -109,7 +115,10 @@ export default function App() {
               onStartInput={() => setCurrentPage('input')}
             />
           ) : (
-            <ParentDashboard children={healthData} parentName={userName} />
+            <ParentDashboard
+              children={parentChildren}  // ← hanya anak milik ibu itu
+              parentName={userName}
+            />
           )
         ) : currentPage === 'input' ? (
           userRole === 'admin' ? (
