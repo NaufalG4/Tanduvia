@@ -16,31 +16,39 @@ import { nutritionGuidelines } from './data/nutritionGuidelines';
 import { ChildHealthData } from './types/health';
 
 type UserRole = 'admin' | 'parent' | 'nutritionist' | null;
-type PageType = 'landing' | 'login' | 'dashboard' | 'education' | 'input' | 'nutrition';
+type PageType =
+  | 'landing'
+  | 'login'
+  | 'dashboard'
+  | 'education'
+  | 'input'
+  | 'nutrition';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('landing');
   const [userRole, setUserRole] = useState<UserRole>(null);
   const [userName, setUserName] = useState('');
-  const [healthData, setHealthData] = useState<ChildHealthData[]>(childrenHealthData);
+  const [healthData, setHealthData] =
+    useState<ChildHealthData[]>(childrenHealthData);
 
   // Data khusus parent: hanya anak dengan parentName = nama login
   const parentChildren = healthData.filter(
     (child) =>
-      child.parentName.trim().toLowerCase() === userName.trim().toLowerCase()
+      child.parentName.trim().toLowerCase() ===
+      userName.trim().toLowerCase()
   );
 
-  // Handler untuk mulai dari landing page (ke login)
+  // Landing → Login
   const handleGetStarted = () => {
     setCurrentPage('login');
   };
 
-  // Handler untuk pelajari lebih lanjut (tanpa login)
+  // Landing → Panduan (tanpa login)
   const handleLearnMore = () => {
     setCurrentPage('education');
   };
 
-  // Handler untuk login (3 role)
+  // Login 3 role
   const handleLogin = (
     role: 'admin' | 'parent' | 'nutritionist',
     name: string
@@ -49,24 +57,22 @@ export default function App() {
     setUserName(name);
 
     if (role === 'nutritionist') {
-      // ahli gizi diarahkan ke halaman kelola gizi
+      // Ahli gizi langsung ke halaman kelola gizi
       setCurrentPage('nutrition');
     } else {
-      // admin & parent ke dashboard
+      // Admin & orang tua → dashboard
       setCurrentPage('dashboard');
     }
   };
 
-  // Handler untuk logout
   const handleLogout = () => {
     setUserRole(null);
     setUserName('');
     setCurrentPage('landing');
-    // Kalau mau reset data saat logout:
+    // Kalau mau reset data:
     // setHealthData(childrenHealthData);
   };
 
-  // Handler untuk navigasi dari header
   const handleNavigate = (page: PageType | 'landing') => {
     if (page === 'landing') {
       handleLogout();
@@ -75,13 +81,12 @@ export default function App() {
     }
   };
 
-  // Handler untuk menambah data baru (hanya kader/admin)
   const handleAddHealthData = (newData: ChildHealthData) => {
     setHealthData((prev) => [newData, ...prev]);
     setCurrentPage('dashboard');
   };
 
-  // Landing page (belum login)
+  // LANDING (belum login)
   if (currentPage === 'landing') {
     return (
       <>
@@ -94,7 +99,7 @@ export default function App() {
     );
   }
 
-  // Login page
+  // LOGIN
   if (currentPage === 'login') {
     return (
       <>
@@ -107,7 +112,7 @@ export default function App() {
     );
   }
 
-  // Education page bisa diakses tanpa login
+  // PANDUAN tanpa login
   if (currentPage === 'education' && !userRole) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -117,53 +122,53 @@ export default function App() {
     );
   }
 
-  // Halaman setelah login
+  // HALAMAN SETELAH LOGIN
   return (
     <div className="min-h-screen bg-gray-50">
       <HealthHeader
-        currentPage={currentPage as 'dashboard' | 'education' | 'input' | 'nutrition'}
+        currentPage={
+          currentPage as 'dashboard' | 'education' | 'input' | 'nutrition'
+        }
         onNavigate={handleNavigate}
         userRole={userRole}
         userName={userName}
         onLogout={handleLogout}
       />
 
-      <main>
-        {/* Halaman khusus ahli gizi */}
+      <main className="pt-4 md:pt-6 lg:pt-8">
+        {/* 1. Ahli gizi: halaman utama = Kelola Gizi */}
         {userRole === 'nutritionist' && currentPage === 'nutrition' ? (
           <NutritionManagement guidelines={nutritionGuidelines} />
         ) : currentPage === 'dashboard' ? (
-          // DASHBOARD
+          // 2. DASHBOARD untuk admin & orang tua
           userRole === 'admin' ? (
-            // Kader / petugas posyandu
             <HealthDashboard
               children={healthData}
               onStartInput={() => setCurrentPage('input')}
             />
-          ) : userRole === 'nutritionist' ? (
-            // Kalau nutritionist buka "Dashboard", anggap sama dengan halaman gizi
-            <NutritionManagement guidelines={nutritionGuidelines} />
           ) : (
-            // Ibu balita / orang tua
-            <ParentDashboard children={parentChildren} parentName={userName} />
+            <ParentDashboard
+              children={parentChildren}
+              parentName={userName}
+            />
           )
         ) : currentPage === 'input' ? (
-          // INPUT DATA
+          // 3. INPUT DATA (khusus admin)
           userRole === 'admin' ? (
             <HealthDataInput onSubmit={handleAddHealthData} />
           ) : (
-            // Ibu & ahli gizi tidak boleh input pemeriksaan
             <div className="min-h-screen flex items-center justify-center p-4">
               <div className="text-center">
                 <h2 className="mb-2 text-gray-900">Akses Terbatas</h2>
                 <p className="text-gray-600">
-                  Hanya petugas posyandu yang dapat menginput data pemeriksaan.
+                  Hanya petugas posyandu yang dapat menginput data
+                  pemeriksaan.
                 </p>
               </div>
             </div>
           )
         ) : (
-          // currentPage === 'education' saat SUDAH login
+          // 4. PANDUAN GIZI setelah login (role apa saja)
           <NutritionEducation />
         )}
       </main>

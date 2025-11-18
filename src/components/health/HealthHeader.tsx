@@ -2,13 +2,12 @@
 import { Button } from '../ui/button';
 import { LayoutDashboard, BookOpen, LogOut, Edit3 } from 'lucide-react';
 
-// helper kecil pengganti ../../lib/utils
+// helper kecil pengganti utils cn
 function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(' ');
 }
 
 type PageType = 'dashboard' | 'education' | 'input' | 'nutrition';
-
 type UserRole = 'admin' | 'parent' | 'nutritionist' | null;
 
 interface HealthHeaderProps {
@@ -38,9 +37,11 @@ export function HealthHeader({
   onNavigate,
   userRole,
   userName,
+  onLogout,
 }: HealthHeaderProps) {
   return (
-    <header className="sticky top-0 z-20 border-b bg-white/80 backdrop-blur">
+    // HAPUS sticky supaya tidak nutup konten waktu scroll
+    <header className="border-b bg-white">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         {/* Logo / Title */}
         <div className="flex items-center gap-2">
@@ -59,19 +60,21 @@ export function HealthHeader({
 
         {/* Navigation */}
         <nav className="flex items-center gap-2">
-          {/* Dashboard selalu ada untuk user logged-in */}
-          <Button
-            variant={currentPage === 'dashboard' ? 'default' : 'ghost'}
-            size="sm"
-            className={cn(
-              'gap-2 rounded-full',
-              currentPage === 'dashboard' && 'bg-gray-900 text-white'
-            )}
-            onClick={() => onNavigate('dashboard')}
-          >
-            <LayoutDashboard className="h-4 w-4" />
-            Dashboard
-          </Button>
+          {/* Dashboard TIDAK tampil untuk ahli gizi */}
+          {userRole !== 'nutritionist' && (
+            <Button
+              variant={currentPage === 'dashboard' ? 'default' : 'ghost'}
+              size="sm"
+              className={cn(
+                'gap-2 rounded-full',
+                currentPage === 'dashboard' && 'bg-gray-900 text-white'
+              )}
+              onClick={() => onNavigate('dashboard')}
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              Dashboard
+            </Button>
+          )}
 
           {/* Input data hanya untuk admin (petugas posyandu) */}
           {userRole === 'admin' && (
