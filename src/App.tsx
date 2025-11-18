@@ -1,3 +1,4 @@
+// src/App.tsx
 import { useState } from 'react';
 import { LandingPage } from './components/health/LandingPage';
 import { LoginPage } from './components/health/LoginPage';
@@ -34,23 +35,27 @@ export default function App() {
     setCurrentPage('login');
   };
 
-  // Handler untuk pelajari lebih lanjut
+  // Handler untuk pelajari lebih lanjut (tanpa login)
   const handleLearnMore = () => {
     setCurrentPage('education');
   };
 
   // Handler untuk login (3 role)
-const handleLogin = (role: 'admin' | 'parent' | 'nutritionist', name: string) => {
-  setUserRole(role);
-  setUserName(name);
+  const handleLogin = (
+    role: 'admin' | 'parent' | 'nutritionist',
+    name: string
+  ) => {
+    setUserRole(role);
+    setUserName(name);
 
-  if (role === 'nutritionist') {
-    setCurrentPage('nutrition');  // langsung ke halaman ahli gizi
-  } else {
-    setCurrentPage('dashboard');
-  }
-};
-
+    if (role === 'nutritionist') {
+      // ahli gizi diarahkan ke halaman kelola gizi
+      setCurrentPage('nutrition');
+    } else {
+      // admin & parent ke dashboard
+      setCurrentPage('dashboard');
+    }
+  };
 
   // Handler untuk logout
   const handleLogout = () => {
@@ -62,7 +67,7 @@ const handleLogin = (role: 'admin' | 'parent' | 'nutritionist', name: string) =>
   };
 
   // Handler untuk navigasi dari header
-  const handleNavigate = (page: PageType) => {
+  const handleNavigate = (page: PageType | 'landing') => {
     if (page === 'landing') {
       handleLogout();
     } else {
@@ -80,7 +85,10 @@ const handleLogin = (role: 'admin' | 'parent' | 'nutritionist', name: string) =>
   if (currentPage === 'landing') {
     return (
       <>
-        <LandingPage onGetStarted={handleGetStarted} onLearnMore={handleLearnMore} />
+        <LandingPage
+          onGetStarted={handleGetStarted}
+          onLearnMore={handleLearnMore}
+        />
         <Toaster />
       </>
     );
@@ -90,7 +98,10 @@ const handleLogin = (role: 'admin' | 'parent' | 'nutritionist', name: string) =>
   if (currentPage === 'login') {
     return (
       <>
-        <LoginPage onLogin={handleLogin} onBack={() => setCurrentPage('landing')} />
+        <LoginPage
+          onLogin={handleLogin}
+          onBack={() => setCurrentPage('landing')}
+        />
         <Toaster />
       </>
     );
@@ -110,14 +121,19 @@ const handleLogin = (role: 'admin' | 'parent' | 'nutritionist', name: string) =>
   return (
     <div className="min-h-screen bg-gray-50">
       <HealthHeader
-      currentPage={currentPage as 'dashboard' | 'education' | 'input' | 'nutrition'}
-      onNavigate={handleNavigate}
-      userRole={userRole}
-      userName={userName}
-      onLogout={handleLogout}
-/>
+        currentPage={currentPage as 'dashboard' | 'education' | 'input' | 'nutrition'}
+        onNavigate={handleNavigate}
+        userRole={userRole}
+        userName={userName}
+        onLogout={handleLogout}
+      />
+
       <main>
-        {currentPage === 'dashboard' ? (
+        {/* Halaman khusus ahli gizi */}
+        {userRole === 'nutritionist' && currentPage === 'nutrition' ? (
+          <NutritionManagement guidelines={nutritionGuidelines} />
+        ) : currentPage === 'dashboard' ? (
+          // DASHBOARD
           userRole === 'admin' ? (
             // Kader / petugas posyandu
             <HealthDashboard
@@ -125,16 +141,14 @@ const handleLogin = (role: 'admin' | 'parent' | 'nutritionist', name: string) =>
               onStartInput={() => setCurrentPage('input')}
             />
           ) : userRole === 'nutritionist' ? (
-            // Ahli gizi: halaman khusus kelola informasi gizi
+            // Kalau nutritionist buka "Dashboard", anggap sama dengan halaman gizi
             <NutritionManagement guidelines={nutritionGuidelines} />
           ) : (
             // Ibu balita / orang tua
-            <ParentDashboard
-              children={parentChildren}
-              parentName={userName}
-            />
+            <ParentDashboard children={parentChildren} parentName={userName} />
           )
         ) : currentPage === 'input' ? (
+          // INPUT DATA
           userRole === 'admin' ? (
             <HealthDataInput onSubmit={handleAddHealthData} />
           ) : (
@@ -149,10 +163,11 @@ const handleLogin = (role: 'admin' | 'parent' | 'nutritionist', name: string) =>
             </div>
           )
         ) : (
-          // currentPage === 'education' saat sudah login
+          // currentPage === 'education' saat SUDAH login
           <NutritionEducation />
         )}
       </main>
+
       <Toaster />
     </div>
   );
