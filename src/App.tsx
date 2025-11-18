@@ -9,8 +9,9 @@ import { HealthDataInput } from './components/health/HealthDataInput';
 import { Toaster } from './components/ui/sonner';
 import { childrenHealthData } from './data/mockHealthData';
 import { ChildHealthData } from './types/health';
+import { NutritionistDashboard } from './components/health/NutritionistDashboard';
 
-type UserRole = 'admin' | 'parent' | null;
+type UserRole = 'admin' | 'parent' | 'nutritionist' | null;
 type PageType = 'landing' | 'login' | 'dashboard' | 'education' | 'input';
 
 export default function App() {
@@ -19,7 +20,7 @@ export default function App() {
   const [userName, setUserName] = useState('');
   const [healthData, setHealthData] = useState<ChildHealthData[]>(childrenHealthData);
 
-  // Data khusus untuk orang tua: hanya lihat anak dengan parentName = nama login
+  // Data khusus parent: hanya anak dengan parentName = nama login
   const parentChildren = healthData.filter(
     (child) =>
       child.parentName.trim().toLowerCase() === userName.trim().toLowerCase()
@@ -36,7 +37,7 @@ export default function App() {
   };
 
   // Handler untuk login
-  const handleLogin = (role: 'admin' | 'parent', name: string) => {
+  const handleLogin = (role: 'admin' | 'parent' | 'nutritionist', name: string) => {
     setUserRole(role);
     setUserName(name);
     setCurrentPage('dashboard');
@@ -47,7 +48,7 @@ export default function App() {
     setUserRole(null);
     setUserName('');
     setCurrentPage('landing');
-    // Kalau mau reset data ke mock awal saat logout, bisa buka komentar ini:
+    // Kalau mau reset data saat logout:
     // setHealthData(childrenHealthData);
   };
 
@@ -60,10 +61,9 @@ export default function App() {
     }
   };
 
-  // Handler untuk menambah data baru (hanya admin)
+  // Handler untuk menambah data baru (hanya kader/admin)
   const handleAddHealthData = (newData: ChildHealthData) => {
     setHealthData((prev) => [newData, ...prev]);
-    // Navigasi ke dashboard setelah submit
     setCurrentPage('dashboard');
   };
 
@@ -110,13 +110,18 @@ export default function App() {
       <main>
         {currentPage === 'dashboard' ? (
           userRole === 'admin' ? (
+            // Kader / petugas posyandu
             <HealthDashboard
               children={healthData}
               onStartInput={() => setCurrentPage('input')}
             />
+          ) : userRole === 'nutritionist' ? (
+            // Ahli gizi: fokus ke manajemen gizi & anak berisiko
+            <NutritionistDashboard children={healthData} />
           ) : (
+            // Ibu balita
             <ParentDashboard
-              children={parentChildren}  // ← hanya anak milik ibu itu
+              children={parentChildren}
               parentName={userName}
             />
           )
@@ -124,7 +129,7 @@ export default function App() {
           userRole === 'admin' ? (
             <HealthDataInput onSubmit={handleAddHealthData} />
           ) : (
-            // Orang tua tidak bisa akses input
+            // Orang tua & ahli gizi tidak boleh input pemeriksaan
             <div className="min-h-screen flex items-center justify-center p-4">
               <div className="text-center">
                 <h2 className="mb-2 text-gray-900">Akses Terbatas</h2>
