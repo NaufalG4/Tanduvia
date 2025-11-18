@@ -15,7 +15,7 @@ import { nutritionGuidelines } from './data/nutritionGuidelines';
 import { ChildHealthData } from './types/health';
 
 type UserRole = 'admin' | 'parent' | 'nutritionist' | null;
-type PageType = 'landing' | 'login' | 'dashboard' | 'education' | 'input';
+type PageType = 'landing' | 'login' | 'dashboard' | 'education' | 'input' | 'nutrition';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('landing');
@@ -40,15 +40,17 @@ export default function App() {
   };
 
   // Handler untuk login (3 role)
-  const handleLogin = (role: 'admin' | 'parent' | 'nutritionist', name: string) => {
-    setUserRole(role);
-    setUserName(name);
-    if (role === 'nutritionist') {
-    setCurrentPage('nutrition');
+const handleLogin = (role: 'admin' | 'parent' | 'nutritionist', name: string) => {
+  setUserRole(role);
+  setUserName(name);
+
+  if (role === 'nutritionist') {
+    setCurrentPage('nutrition');  // langsung ke halaman ahli gizi
   } else {
     setCurrentPage('dashboard');
   }
-  };
+};
+
 
   // Handler untuk logout
   const handleLogout = () => {
@@ -108,12 +110,12 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <HealthHeader
-        currentPage={currentPage as 'dashboard' | 'education' | 'input'}
-        onNavigate={handleNavigate}
-        userRole={userRole}
-        userName={userName}
-        onLogout={handleLogout}
-      />
+      currentPage={currentPage as 'dashboard' | 'education' | 'input' | 'nutrition'}
+      onNavigate={handleNavigate}
+      userRole={userRole}
+      userName={userName}
+      onLogout={handleLogout}
+/>
       <main>
         {currentPage === 'dashboard' ? (
           userRole === 'admin' ? (

@@ -26,9 +26,7 @@ export function LoginPage({ onLogin, onBack }: LoginPageProps) {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-lg">
-            Masuk ke Tanduvia
-          </CardTitle>
+          <CardTitle className="text-lg">Masuk ke Tanduvia</CardTitle>
         </CardHeader>
         <CardContent>
           <form className="space-y-6" onSubmit={handleSubmit}>
@@ -44,8 +42,8 @@ export function LoginPage({ onLogin, onBack }: LoginPageProps) {
 
             <div className="space-y-2">
               <Label>Masuk sebagai</Label>
-              <div className="grid gap-2">
-                <label className="flex items-center gap-2 text-sm">
+              <div className="grid gap-2 text-sm">
+                <label className="flex items-center gap-2">
                   <input
                     type="radio"
                     name="role"
@@ -55,7 +53,8 @@ export function LoginPage({ onLogin, onBack }: LoginPageProps) {
                   />
                   <span>Ibu / Orang Tua Balita</span>
                 </label>
-                <label className="flex items-center gap-2 text-sm">
+
+                <label className="flex items-center gap-2">
                   <input
                     type="radio"
                     name="role"
@@ -65,7 +64,8 @@ export function LoginPage({ onLogin, onBack }: LoginPageProps) {
                   />
                   <span>Petugas / Kader Posyandu</span>
                 </label>
-                <label className="flex items-center gap-2 text-sm">
+
+                <label className="flex items-center gap-2">
                   <input
                     type="radio"
                     name="role"
