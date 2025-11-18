@@ -1,7 +1,11 @@
 // src/components/health/HealthHeader.tsx
 import { Button } from '../ui/button';
-import { cn } from '../../lib/utils'; // kalau di project-mu pakai helper lain, sesuaikan
 import { LayoutDashboard, BookOpen, LogOut, Edit3 } from 'lucide-react';
+
+// helper kecil pengganti ../../lib/utils
+function cn(...classes: Array<string | false | null | undefined>) {
+  return classes.filter(Boolean).join(' ');
+}
 
 type PageType = 'dashboard' | 'education' | 'input' | 'nutrition';
 
@@ -34,7 +38,6 @@ export function HealthHeader({
   onNavigate,
   userRole,
   userName,
-  onLogout,
 }: HealthHeaderProps) {
   return (
     <header className="sticky top-0 z-20 border-b bg-white/80 backdrop-blur">
